@@ -1,0 +1,52 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['numero_oculto'])) {
+    $_SESSION['numero_oculto'] = rand(1, 100);
+    $_SESSION['intentos'] = 0;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $numero_introducido = (int)$_POST['numero'];
+    $_SESSION['intentos']++;
+
+    if ($numero_introducido < $_SESSION['numero_oculto']) {
+        $mensaje = "El número oculto es más alto";
+    } elseif ($numero_introducido > $_SESSION['numero_oculto']) {
+        $mensaje = "El número oculto es más bajo";
+    } else {
+        $mensaje = "Enhorabuena de la buena!";
+        if ($_SESSION['intentos'] < 4) {
+            $ranking = "eres muy grande";
+        } elseif ($_SESSION['intentos'] < 8) {
+            $ranking = "eres bueno";
+        } elseif ($_SESSION['intentos'] < 12) {
+            $ranking = "eres del montón";
+        } else {
+            $ranking = "dedicate a otra cosa";
+        }
+        $mensaje .= " " . $ranking;
+        session_destroy();  // Reinicia el juego
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Juego Alta Baja</title>
+</head>
+<body>
+    <h1>Juego Alta Baja</h1>
+    <form method="post" action="">
+        <label for="numero">Introduce un número entre 1 y 100:</label>
+        <input type="number" name="numero" id="numero" min="1" max="100" required>
+        <button type="submit">Enviar</button>
+    </form>
+    <p>
+        <?php
+        if (isset($mensaje)) {
+            echo $mensaje;
+        }
+        ?>
+    </p>
